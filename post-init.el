@@ -15,11 +15,11 @@
 
 (add-hook 'prog-mode-hook #'rc-basic/prog)
 
-(use-package outline
-  :ensure nil
-  :hook ((prog-mode text-mode) . outline-minor-mode)
-  :config
-  (add-hook 'outline-minor-mode-hook #'outline-hide-other))
+;; (use-package outline
+;;   :ensure nil
+;;   :hook ((prog-mode text-mode) . outline-minor-mode)
+;;   :config
+;;   (add-hook 'outline-minor-mode-hook #'outline-hide-other))
 
 
 (add-hook 'package-menu-mode-hook #'hl-line-mode)
@@ -117,9 +117,51 @@
 
 (use-package crystal-point :hook (after-init . crystal-point-enable))
 
-(use-package vim-tab-bar :hook after-init)
+;; (use-package vim-tab-bar :hook after-init)
 
-(use-package breadcrumb :hook after-init)
+;; (use-package breadcrumb :hook emacs-startup)
+
+(use-package buffer-box
+  :vc (:url "https://github.com/rougier/buffer-box.git" :rev :newest)
+  :hook ((window-configuration-change) . (lambda ()
+                                           (unless (minibufferp)
+                                             (buffer-box-on)))))
+
+(use-package nano-splash
+  :vc (:url "https://github.com/rougier/nano-splash.git" :rev :newest)
+  :custom
+  (nano-splash-title " GNU EMACS")
+  (nano-splash-subtitle "如是說")
+  :hook (after-init . nano-splash))
+
+;; (use-package nano-vertico
+;;   :vc (:url "https://github.com/rougier/nano-vertico.git" :rev :newest)
+;;   :hook (vertico-mode
+;;          vertico-grid-mode
+;;          vertico-buffer-mode
+;;          vertico-multiform-mode
+;;          vertico-reverse-mode
+;;          vertico-indexed-mode
+;;          vertico-prescient-mode))
+
+;; (use-package nano-modeline
+;;   :vc (:url "https://github.com/rougier/nano-modeline.git" :rev :newest)
+;;   :custom
+;;   (nano-modeline-position #'nano-modeline-footer)
+;;   :config
+;;   (add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
+;;   (add-hook 'text-mode-hook            #'nano-modeline-text-mode)
+;;   (add-hook 'org-mode-hook             #'nano-modeline-org-mode)
+;;   (add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
+;;   (add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
+;;   (add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
+;;   (add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
+;;   (add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
+;;   (add-hook 'term-mode-hook            #'nano-modeline-term-mode)
+;;   (add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
+;;   (add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
+;;   (add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
+;;   (add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode))
 
 
 ;;; Essensial
@@ -242,17 +284,27 @@
 
 
 ;;; MiniBuffer
-(use-package prescient
-  ;; :custom
-  ;; (completion-style '(prescient))	;apply to emacs
-  :config
-  (setq completion-preview-sort-function #'prescient-completion-sort) ;intergrate with this
-  (prescient-persist-mode)		;persist minibuffer history
 
-  (use-package vertico-prescient
-    :config
-    (vertico-prescient-mode)))		;apply to vertico
+;; (use-package prescient
+;;   :custom
+;;   (completion-styles '(prescient basic))
+;;   (prescient-filter-method '(literal initialism regexp prefix))
+;;   (prescient-sort-full-matches-first t)
+;;   :config
+;;   ;; (setq completion-preview-sort-function #'prescient-completion-sort) ;intergrate with this
+;;   (prescient-persist-mode))             ;persist minibuffer history
 
+;; (use-package vertico-prescient
+;;   :config
+;;   (setq vertico-prescient-enable-sorting t)
+;;   (vertico-prescient-mode)) ;apply to vertico
+
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
 
 (use-package vertico
   :pin melpa
@@ -267,13 +319,14 @@
    )
   :config
   (setq vertico-resize t)
+  (setq completion-in-region-function #'consult-completion-in-region)
 
   (setq vertico-multiform-commands
         '((consult-line buffer)
           (consult-ripgrep buffer)
           (consult-imenu buffer indexed)
 	      (consult-outline buffer)
-	      (execute-extended-command indexed grid reverse)))
+	      (execute-extended-command reverse grid)))
 
   (setq vertico-multiform-categories
         '((file
@@ -285,22 +338,14 @@
   (vertico-multiform-mode)
 
 
-  (setq completion-in-region-function
-        (lambda (&rest args)
-          (apply (if vertico-mode
-                     #'consult-completion-in-region
-                   #'completion--in-region)
-                 args)))
-
-
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+  ;; Prompt indicator for `completing-read-multiple'.
+  (when (< emacs-major-version 31)
+    (advice-add #'completing-read-multiple :filter-args
+                (lambda (args)
+                  (cons (format "[CRM%s] %s"
+                                (string-replace "[ \t]*" "" crm-separator)
+                                (car args))
+                        (cdr args)))))
 
 
   (defun sort-directories-first (files)
@@ -323,18 +368,7 @@
     "If FILE ends with a slash, highlight it as a directory."
     (if (string-suffix-p "/" file)
         (propertize file 'face 'marginalia-file-priv-dir) ; or face 'dired-directory
-      file))
-
-  (defun my/vertico-truncate-candidates (args)
-    (if-let ((arg (car args))
-             (type (get-text-property 0 'multi-category arg))
-             ((eq (car-safe type) 'file))
-             (w (max 30 (- (window-width) 38)))
-             (l (length arg))
-             ((> l w)))
-        (setcar args (concat "…" (truncate-string-to-width arg l (- l w)))))
-    args)
-  (advice-add #'vertico--format-candidate :filter-args #'my/vertico-truncate-candidates))
+      file)))
 
 
 (use-package consult
