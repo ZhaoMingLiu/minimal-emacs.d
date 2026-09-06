@@ -1,6 +1,41 @@
 ;;; post-init.el -- POST-INIT -*- no-byte-compile: t; lexical-binding: t; -*-
 
 ;;; Basic
+;; Essential for Windows
+(when (eq system-type 'windows-nt)
+  (let ((user-home (or (getenv "USERPROFILE") (getenv "HOME"))))
+    (when user-home
+      (setq default-directory (file-name-as-directory (expand-file-name user-home)))
+      ;; (cd default-directory)
+      ))
+
+  (let ((msys-ucrt-bin "C:/msys64/ucrt64/bin")
+        (msys-usr-bin  "C:/msys64/usr/bin"))
+    (add-to-list 'exec-path msys-ucrt-bin)
+    (add-to-list 'exec-path msys-usr-bin)
+    (setenv "PATH" (concat msys-ucrt-bin ";" msys-usr-bin ";" (getenv "PATH"))))
+
+  (add-to-list 'exec-path "C:/Program Files/LLVM/bin")
+  (setenv "PATH" (concat "C:/Program Files/LLVM/bin;" (getenv "PATH")))
+
+
+  (use-package epg-config
+    :ensure nil
+    :custom
+    (epg-gpg-program "\"C:/Program Files/GnuPG/bin/gpg.exe\"") ; force using GPG4Win
+    (epg-pinentry-mode 'loopback))
+
+  (use-package package
+    :ensure nil
+    :config
+    (setq package-gnupghome-dir
+          (concat (get-file-buffer user-emacs-directory) "elpa/gnupg/"))) ; Get Clean Path for GPG4Win
+
+
+  (setq w32-recognize-altgr nil))
+
+
+;; Must Have
 (setq visible-bell t)
 (setq ring-bell-function 'default)
 
@@ -99,16 +134,40 @@
 (use-package modus-flexoki
   :vc (:url "https://github.com/dpassen/modus-flexoki"
             :rev :newest)
-  :config
-  (load-theme 'modus-flexoki-light :no-confirm))
+  ;; :config
+  ;; (load-theme 'modus-flexoki-light :no-confirm))
+  )
+
+(use-package auto-dark
+  :init (auto-dark-mode)
+  :custom
+  (custom-safe-themes t)
+  (auto-dark-themes '((modus-flexoki-dark) (modus-flexoki-light))))
 
 ;; Fonts
-(unless (find-font (font-spec :name "Symbols Nerd Font Mono"))
-  (nerd-icons-install-fonts "c:/Users/username/Desktop/"))
+(use-package nerd-icons
+  :config
+  (unless (find-font (font-spec :name "Symbols Nerd Font Mono"))
+    (nerd-icons-install-fonts (concat (getenv "USERPROFILE") "/Desktop/"))))
 
 (set-face-attribute 'default nil :family "Zx Proto" :height 100 :weight 'normal)
 
-(set-face-attribute 'font-lock-comment-face nil :font "Zx Proto::+ss01" :slant 'italic :underline t)
+(set-face-attribute 'font-lock-comment-face nil :font "Zx Proto::+ss01" :slant 'italic :underline nil)
+
+(progn
+  ;; set font for emoji (if before emacs 28, should come after setting symbols. emacs 28 now has 'emoji . before, emoji is part of 'symbol)
+  (set-fontset-font
+   t
+   (if (version< emacs-version "28.1")
+       '(#x1f300 . #x1fad0)
+     'emoji
+     )
+   (cond
+    ((member "Apple Color Emoji" (font-family-list)) "Apple Color Emoji")
+    ((member "Noto Color Emoji" (font-family-list)) "Noto Color Emoji")
+    ((member "Noto Emoji" (font-family-list)) "Noto Emoji")
+    ((member "Segoe UI Emoji" (font-family-list)) "Segoe UI Emoji")
+    ((member "Symbola" (font-family-list)) "Symbola"))))
 
 ;; Utils
 (use-package rainbow-delimiters :hook prog-mode)
@@ -119,49 +178,13 @@
 
 ;; (use-package vim-tab-bar :hook after-init)
 
-;; (use-package breadcrumb :hook emacs-startup)
+(use-package breadcrumb :hook emacs-startup)
 
-(use-package buffer-box
-  :vc (:url "https://github.com/rougier/buffer-box.git" :rev :newest)
-  :hook ((window-configuration-change) . (lambda ()
-                                           (unless (minibufferp)
-                                             (buffer-box-on)))))
-
-(use-package nano-splash
-  :vc (:url "https://github.com/rougier/nano-splash.git" :rev :newest)
-  :custom
-  (nano-splash-title " GNU EMACS")
-  (nano-splash-subtitle "如是說")
-  :hook (after-init . nano-splash))
-
-;; (use-package nano-vertico
-;;   :vc (:url "https://github.com/rougier/nano-vertico.git" :rev :newest)
-;;   :hook (vertico-mode
-;;          vertico-grid-mode
-;;          vertico-buffer-mode
-;;          vertico-multiform-mode
-;;          vertico-reverse-mode
-;;          vertico-indexed-mode
-;;          vertico-prescient-mode))
-
-;; (use-package nano-modeline
-;;   :vc (:url "https://github.com/rougier/nano-modeline.git" :rev :newest)
-;;   :custom
-;;   (nano-modeline-position #'nano-modeline-footer)
-;;   :config
-;;   (add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
-;;   (add-hook 'text-mode-hook            #'nano-modeline-text-mode)
-;;   (add-hook 'org-mode-hook             #'nano-modeline-org-mode)
-;;   (add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
-;;   (add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
-;;   (add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
-;;   (add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
-;;   (add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
-;;   (add-hook 'term-mode-hook            #'nano-modeline-term-mode)
-;;   (add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
-;;   (add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
-;;   (add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
-;;   (add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode))
+;; (use-package buffer-box
+;;   :vc (:url "https://github.com/rougier/buffer-box.git" :rev :newest)
+;;   :hook ((window-configuration-change) . (lambda ()
+;;                                            (unless (minibufferp)
+;;                                              (buffer-box-on)))))
 
 
 ;;; Essensial
@@ -271,7 +294,7 @@
 (use-package undo-fu-session
   :config
   (setq undo-fu-session-compression
-	    (when (eq system-type 'windows-nt) 'zst))
+        (when (eq system-type 'windows-nt) 'zst))
   (undo-fu-session-global-mode t))
 
 (use-package undo-fu
@@ -279,7 +302,7 @@
          ("C-z" . undo-fu-only-undo)
          ("C-S-z" . undo-fu-only-redo))
   :init
-  (setq undo-fu-allow-undo-in-region t
+  (setq undo-fu-allow-undo-in-region nil
 	    undo-fu-ignore-keyboard-quit t))
 
 
@@ -411,6 +434,12 @@
 
 (use-package eglot
   :ensure nil
+  :commands (eglot-ensure
+             eglot-rename
+             eglot-format-buffer)
+  :config
+  (setq eglot-autoshutdown t)
+  (setq eglot-sync-connect nil)
   :hook ((python-mode
 	      python-ts-mode
 
@@ -428,8 +457,9 @@
   :ensure nil
   :defer t
   :custom
-  ((insert-directory-program
-    (when (eq system-type 'windows-nt) "ls.exe"))
+  (
+   ;; ((insert-directory-program
+   ;;   (when (eq system-type 'windows-nt) "ls.exe"))
 
    (ls-lisp-use-insert-directory-program
     (when (eq system-type 'windows-nt) t))
@@ -452,8 +482,9 @@
    :map dirvish-mode-map
    ("?" . dirvish-dispatch)
    ("v" . dirvish-vc-menu))
-  :hook
-  (emacs-startup . dirvish-side))
+  ;; :hook
+  ;; (emacs-startup . dirvish-side)
+  )
 
 
 (use-package nerd-icons-dired :hook dired-mode)
@@ -467,7 +498,34 @@
   ("C-x g" . magit-status))
 
 
+(use-package diff-hl
+  :commands (diff-hl-mode
+             global-diff-hl-mode)
+  :hook (prog-mode . diff-hl-mode)
+  :init
+  (setq diff-hl-flydiff-delay 0.4)  ; Faster
+  (setq diff-hl-show-staged-changes nil)  ; Realtime feedback
+  (setq diff-hl-update-async t)  ; Do not block Emacs
+  (setq diff-hl-global-modes '(not pdf-view-mode image-mode)))
+
+
 ;;; TTY
-(use-package mistty
-  :bind (("C-c s" . mistty)
-	     ("C-c 4 s" . mistty-other-window)))
+(use-package ghostel
+  :ensure t
+  :bind (("C-x m" . ghostel)
+         :map ghostel-mode-map
+         ("C-c l" . ghostel-clear-scrollback))
+  :config
+  (setq ghostel-shell '("powershell.exe")))
+
+(use-package ghostel-eshell
+  :ensure nil
+  :hook (eshell-load . ghostel-eshell-visual-command-mode))
+
+(use-package ghostel-compile
+  :ensure nil
+  :hook (after-init . ghostel-compile-global-mode))
+
+(use-package ghostel-comint
+  :ensure nil
+  :hook (after-init . ghostel-comint-global-mode))
