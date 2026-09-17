@@ -2,8 +2,7 @@
 
 (use-package ghostel
   :ensure t
-  :bind (
-         ;; ("C-x m" . ghostel)
+  :bind (("C-x m" . ghostel)
          :map ghostel-mode-map
          ("C-c l" . ghostel-clear-scrollback))
   :config
