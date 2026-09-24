@@ -16,6 +16,9 @@
   :config
   (setq eglot-autoshutdown t
         eglot-sync-connect nil)
+
+  (add-to-list 'eglot-ignored-server-capabilities :semanticTokensProvider)
+
   :hook ((python-mode
 	      python-ts-mode
 
@@ -27,7 +30,15 @@
           yaml-ts-mode) . eglot-ensure))
 
 
+(use-package eglot-python-preset
+  :ensure t
+  :custom
+  (eglot-python-preset-lsp-server 'ty)) ; or 'basedpyright, 'pyrefly, 'zuban, or 'rass
+
 (add-hook 'python-ts-mode-hook #'display-fill-column-indicator-mode)
+
+
+(use-package powershell :ensure t)
 
 
 (use-package apheleia

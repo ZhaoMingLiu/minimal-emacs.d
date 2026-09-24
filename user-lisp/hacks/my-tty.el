@@ -2,12 +2,12 @@
 
 (use-package ghostel
   :ensure t
-  :bind (("C-x m" . ghostel)
-         :map ghostel-mode-map
-         ("C-c l" . ghostel-clear-scrollback))
+  :bind (("C-x m" . ghostel))
   :config
   (when (eq system-type 'windows-nt)
-    (setq ghostel-shell '("powershell.exe" "-NoLogo" "-ExecutionPolicy" "Bypass"))))
+    (setq ghostel-shell '("powershell.exe"
+                          "-NoLogo"
+                          "-ExecutionPolicy" "Bypass"))))
 
 (use-package ghostel-eshell
   :ensure nil
@@ -26,8 +26,8 @@
   :vc (:url "https://github.com/dakra/ghostel"
             :lisp-dir "extensions/consult-ghostel"
             :rev :newest)
-  :after (ghostel consult)
-  :demand t
+  ;; :after (ghostel consult)
+  ;; :demand t
   :bind (("C-x m" . consult-ghostel)
          :map project-prefix-map
          ("m" . consult-ghostel-project)

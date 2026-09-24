@@ -60,7 +60,22 @@
   :init (auto-dark-mode)
   :custom
   (custom-safe-themes t)
-  (auto-dark-themes '((modus-flexoki-dark) (modus-flexoki-light))))
+  (auto-dark-allow-powershell (when (eq system-type 'windows-nt) t))
+  (auto-dark-themes '((modus-flexoki-dark) (modus-flexoki-light)))
+  :hook
+  (auto-dark-dark-mode
+   . (lambda ()
+       (use-package rainbow-delimiters
+         :config
+         (rainbow-delimiters-mode 1))
+       ))
+  (auto-dark-light-mode
+   . (lambda ()
+       (use-package rainbow-delimiters
+         :config
+         (rainbow-delimiters-mode -1))
+       ))
+  )
 
 ;; Fonts
 (use-package nerd-icons
@@ -88,7 +103,7 @@
     ((member "Symbola" (font-family-list)) "Symbola"))))
 
 ;; Utils
-(use-package rainbow-delimiters :hook prog-mode)
+;; (use-package rainbow-delimiters :hook prog-mode)
 
 (use-package goggles :hook ((prog-mode text-mode) . goggles-mode))
 
@@ -103,6 +118,8 @@
 ;;   (moody-replace-mode-line-front-space)
 ;;   (moody-replace-mode-line-buffer-identification)
 ;;   (moody-replace-vc-mode))
+
+(use-package mode-line-bell :config (mode-line-bell-mode))
 
 
 (provide 'rendering)
