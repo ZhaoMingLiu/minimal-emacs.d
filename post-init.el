@@ -1,7 +1,8 @@
 ;;; post-init.el -- POST-INIT -*- no-byte-compile: t; lexical-binding: t; -*-
 
 ;;; Basic
-(require 'ms-windows)
+(when (eq system-type 'windows-nt)
+  (require 'ms-windows))
 
 ;; Must Have
 (setq visible-bell t)
