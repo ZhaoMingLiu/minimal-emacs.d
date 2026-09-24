@@ -1,19 +1,5 @@
 ;;; my-minibuffer.el --- My Minibuffer Config -*- no-byte-compile: t; lexical-binding: t; -*-
 
-;; (use-package prescient
-;;   :custom
-;;   (completion-styles '(prescient basic))
-;;   (prescient-filter-method '(literal initialism regexp prefix))
-;;   (prescient-sort-full-matches-first t)
-;;   :config
-;;   ;; (setq completion-preview-sort-function #'prescient-completion-sort) ;intergrate with this
-;;   (prescient-persist-mode))             ;persist minibuffer history
-
-;; (use-package vertico-prescient
-;;   :config
-;;   (setq vertico-prescient-enable-sorting t)
-;;   (vertico-prescient-mode)) ;apply to vertico
-
 (use-package orderless
   :ensure t
   :custom
@@ -23,7 +9,7 @@
 
 (use-package vertico
   :pin melpa
-  :hook ((after-init . vertico-mode)
+  :hook ((elpaca-after-init . vertico-mode)
 	     (minibuffer-setup . vertico-repeat-save))
   :bind
   (("M-q" . #'vertico-quick-insert)
@@ -51,16 +37,6 @@
 	       (vertico-buffer-display-action . (display-buffer-same-window)))))
 
   (vertico-multiform-mode)
-
-
-  ;; Prompt indicator for `completing-read-multiple'.
-  (when (< emacs-major-version 31)
-    (advice-add #'completing-read-multiple :filter-args
-                (lambda (args)
-                  (cons (format "[CRM%s] %s"
-                                (string-replace "[ \t]*" "" crm-separator)
-                                (car args))
-                        (cdr args)))))
 
 
   (defun sort-directories-first (files)
@@ -101,7 +77,8 @@
 	     ("M-g g" . consult-goto-line)
 	     ("M-g i" . consult-imenu)
 	     )
-  :hook (completion-list-mode . consult-preview-at-point-mode))
+  ;; :hook (completion-list-mode . consult-preview-at-point-mode)
+  )
 
 
 (use-package marginalia

@@ -46,7 +46,8 @@
   :commands (apheleia-mode
              apheleia-global-mode)
   :hook ((prog-mode
-          yaml-ts-mode) . apheleia-mode))
+          yaml-ts-mode
+          toml-ts-mode) . apheleia-mode))
 
 
 (provide 'language)

@@ -107,11 +107,11 @@
 
 (use-package goggles :hook ((prog-mode text-mode) . goggles-mode))
 
-(use-package crystal-point :hook (after-init . crystal-point-enable))
+(use-package crystal-point :hook (elpaca-after-init . crystal-point-enable))
 
 ;; (use-package vim-tab-bar :hook after-init)
 
-(use-package breadcrumb :hook emacs-startup)
+(use-package breadcrumb :hook elpaca-after-init)
 
 ;; (use-package moody
 ;;   :config
