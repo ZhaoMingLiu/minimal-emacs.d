@@ -42,6 +42,16 @@
 (global-set-key (kbd "C-x B") 'split-recent-buffer) ; Fun
 
 
+(use-package elpaca
+  :ensure nil
+  :bind
+  ([remap describe-package] . elpaca-info)
+  :init
+  (when (eq system-type 'windows-nt)
+    (setq elpaca-makeinfo-executable (executable-find "makeinfo")
+          elpaca-install-info-executable (executable-find "install-info"))))
+
+
 ;;; Rendering
 (require 'rendering)
 

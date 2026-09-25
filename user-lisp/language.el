@@ -27,7 +27,9 @@
 	      sh-mode
 	      bash-ts-mode
 
-          yaml-ts-mode) . eglot-ensure))
+          yaml-ts-mode
+
+          powershell-mode) . eglot-ensure))
 
 
 (use-package eglot-python-preset

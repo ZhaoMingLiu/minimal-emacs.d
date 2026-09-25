@@ -20,6 +20,7 @@
    )
   :config
   (setq vertico-resize t)
+  (setq vertico-grid-annotate 10)
   (setq completion-in-region-function #'consult-completion-in-region)
 
   (setq vertico-multiform-commands
@@ -27,7 +28,8 @@
           (consult-ripgrep buffer)
           (consult-imenu buffer indexed)
 	      (consult-outline buffer)
-	      (execute-extended-command reverse grid)))
+          (recentf-open indexed)
+	      (execute-extended-command reverse grid indexed)))
 
   (setq vertico-multiform-categories
         '((file
@@ -79,6 +81,14 @@
 	     )
   ;; :hook (completion-list-mode . consult-preview-at-point-mode)
   )
+
+
+(use-package consult-dir
+  :ensure t
+  :bind (("C-x C-d" . consult-dir)
+         :map vertico-map
+         ("C-x C-d" . consult-dir)
+         ("C-x C-j" . consult-dir-jump-file)))
 
 
 (use-package marginalia

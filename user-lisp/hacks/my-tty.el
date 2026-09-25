@@ -5,7 +5,7 @@
   :bind (("C-x m" . ghostel))
   :config
   (when (eq system-type 'windows-nt)
-    (setq ghostel-shell '("powershell.exe"
+    (setq ghostel-shell '("pwsh"        ; better than powershell.exe
                           "-NoLogo"
                           "-ExecutionPolicy" "Bypass"))))
 
