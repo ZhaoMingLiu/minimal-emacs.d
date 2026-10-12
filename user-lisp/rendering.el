@@ -50,31 +50,25 @@
   (setq modus-themes-include-derivatives-mode t))
 
 (use-package modus-flexoki
-  :vc (:url "https://github.com/dpassen/modus-flexoki"
-            :rev :newest)
+  :ensure (:host github :repo "https://github.com/dpassen/modus-flexoki")
   ;; :config
   ;; (load-theme 'modus-flexoki-light :no-confirm))
   )
 
 (use-package auto-dark
-  :init (auto-dark-mode)
+  :ensure t
+  :init (auto-dark-mode 1)
   :custom
   (custom-safe-themes t)
-  (auto-dark-allow-powershell (when (eq system-type 'windows-nt) t))
+  (auto-dark-allow-powershell (eq system-type 'windows-nt))
   (auto-dark-themes '((modus-flexoki-dark) (modus-flexoki-light)))
-  :hook
-  (auto-dark-dark-mode
-   . (lambda ()
-       (use-package rainbow-delimiters
-         :config
-         (rainbow-delimiters-mode 1))
-       ))
-  (auto-dark-light-mode
-   . (lambda ()
-       (use-package rainbow-delimiters
-         :config
-         (rainbow-delimiters-mode -1))
-       ))
+  ;; :hook
+  ;; (auto-dark-dark-mode
+  ;;  . (lambda ()
+  ;;      (rainbow-delimiters-mode 1)))
+  ;; (auto-dark-light-mode
+  ;;  . (lambda ()
+  ;;      (rainbow-delimiters-mode -1)))
   )
 
 ;; Fonts
@@ -85,7 +79,18 @@
 
 (set-face-attribute 'default nil :family "Zx Proto" :height 100 :weight 'normal)
 
-(set-face-attribute 'font-lock-comment-face nil :font "Zx Proto::+ss01" :slant 'italic :underline nil)
+;; (set-face-attribute 'font-lock-comment-face nil :font "Zx Proto::+ss01" :slant 'italic :underline nil)
+
+;; (when (eq system-type 'windows-nt)
+;;   (use-package cnfonts
+;;     :hook elpaca-after-init-hook
+;;     :custom
+;;     (cnfonts-personal-fontnames '(("Zx Proto::+ss01")
+;;                                   ("微软雅黑")
+;;                                   ("SimSun-ExtB")
+;;                                   ("Segoe UI Symbol")
+;;                                   ("MS Gothic")))))
+
 
 (progn
   ;; set font for emoji (if before emacs 28, should come after setting symbols. emacs 28 now has 'emoji . before, emoji is part of 'symbol)
@@ -103,21 +108,21 @@
     ((member "Symbola" (font-family-list)) "Symbola"))))
 
 ;; Utils
-;; (use-package rainbow-delimiters :hook prog-mode)
+;; (use-package rainbow-delimiters :ensure t)
 
 (use-package goggles :hook ((prog-mode text-mode) . goggles-mode))
 
-(use-package crystal-point :hook (elpaca-after-init . crystal-point-enable))
+;; (use-package crystal-point :hook (elpaca-after-init . crystal-point-enable))
 
 ;; (use-package vim-tab-bar :hook after-init)
 
 (use-package breadcrumb :hook elpaca-after-init)
 
-;; (use-package moody
-;;   :config
-;;   (moody-replace-mode-line-front-space)
-;;   (moody-replace-mode-line-buffer-identification)
-;;   (moody-replace-vc-mode))
+(use-package moody
+  :config
+  (moody-replace-mode-line-front-space)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
 
 (use-package mode-line-bell :config (mode-line-bell-mode))
 

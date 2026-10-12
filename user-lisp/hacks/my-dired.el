@@ -11,7 +11,7 @@
    (ls-lisp-use-insert-directory-program
     (when (eq system-type 'windows-nt) t))
 
-   (dired-listing-switches "-AlhGgL --group-directories-first"))
+   (dired-listing-switches "-Alh --group-directories-first --no-group"))
   :bind (:map dired-mode-map
 	          ("K" . dired-kill-subdir)))
 
@@ -29,9 +29,18 @@
    :map dirvish-mode-map
    ("?" . dirvish-dispatch)
    ("v" . dirvish-vc-menu))
-  ;; :hook
+  :hook
   ;; (emacs-startup . dirvish-side)
-  )
+  (dirvish-setup . dirvish-emerge-mode))
+
+;; Additional syntax highlighting for dired
+(use-package diredfl
+  :hook
+  ((dired-mode . diredfl-mode)
+   ;; highlight parent and directory preview as well
+   (dirvish-directory-view-mode . diredfl-mode))
+  :config
+  (set-face-attribute 'diredfl-dir-name nil :bold t))
 
 
 (use-package nerd-icons-dired :hook dired-mode)

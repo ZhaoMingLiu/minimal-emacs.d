@@ -15,24 +15,23 @@
 
 (use-package ghostel-compile
   :ensure nil
-  :hook (after-init . ghostel-compile-global-mode))
+  :hook (elpaca-after-init . ghostel-compile-global-mode))
 
 (use-package ghostel-comint
   :ensure nil
-  :hook (after-init . ghostel-comint-global-mode))
+  :hook (elpaca-after-init . ghostel-comint-global-mode))
 
 
-(use-package consult-ghostel
-  :vc (:url "https://github.com/dakra/ghostel"
-            :lisp-dir "extensions/consult-ghostel"
-            :rev :newest)
-  ;; :after (ghostel consult)
-  ;; :demand t
-  :bind (("C-x m" . consult-ghostel)
-         :map project-prefix-map
-         ("m" . consult-ghostel-project)
-         :map ghostel-semi-char-mode-map
-         ("C-c h" . consult-ghostel-history)))
+;; (use-package consult-ghostel
+;;   :ensure nil
+;;   :after (ghostel consult)
+;;   :demand t
+;;   ;; :hook (elpaca-after-init . consult-ghostel-mode)
+;;   :bind (("C-x m" . consult-ghostel)
+;;          :map project-prefix-map
+;;          ("m" . consult-ghostel-project)
+;;          :map ghostel-semi-char-mode-map
+;;          ("C-c h" . consult-ghostel-history)))
 
 
 (provide 'my-tty)

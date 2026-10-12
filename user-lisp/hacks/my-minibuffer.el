@@ -1,11 +1,15 @@
 ;;; my-minibuffer.el --- My Minibuffer Config -*- no-byte-compile: t; lexical-binding: t; -*-
 
-(use-package orderless
-  :ensure t
+(use-package prescient
   :custom
-  (completion-styles '(orderless basic))
-  (completion-category-overrides '((file (styles partial-completion))))
-  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
+  (completion-style '(prescient))	;apply to emacs
+  :config
+  (setq completion-preview-sort-function #'prescient-completion-sort) ;intergrate with this
+  (prescient-persist-mode))		;persist minibuffer history
+
+(use-package vertico-prescient
+  :config
+  (vertico-prescient-mode))		;apply to vertico
 
 (use-package vertico
   :pin melpa
